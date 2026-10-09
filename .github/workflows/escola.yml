@@ -1,0 +1,88 @@
+name: Escola+
+
+on:
+  push:
+    paths: ["escola/**", ".github/workflows/escola.yml"]
+  pull_request:
+    paths: ["escola/**", ".github/workflows/escola.yml"]
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: "URL do backoffice na nuvem embutida no APK (ex.: https://escola.suaescola.com.br/)"
+        required: false
+      publicar_capturas:
+        description: "Salvar as capturas de tela em escola/docs/capturas na própria branch"
+        type: boolean
+        default: false
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: escola/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: escola/backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: escola/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Gerar APK
+        env:
+          API_URL: ${{ github.event.inputs.api_url }}
+        run: |
+          chmod +x gradlew
+          if [ -n "$API_URL" ]; then ./gradlew assembleDebug -PapiUrl="$API_URL"; else ./gradlew assembleDebug; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: escola-mais-apk
+          path: escola/android/app/build/outputs/apk/debug/*.apk
+
+  capturas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: escola/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Gerar capturas de tela
+        run: |
+          chmod +x gradlew
+          ./gradlew recordRoborazziDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: escola-mais-capturas
+          path: escola/android/app/build/capturas/*.png
+      - name: Salvar capturas no repositório
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publicar_capturas }}
+        run: |
+          mkdir -p ../docs/capturas
+          cp app/build/capturas/*.png ../docs/capturas/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ../docs/capturas
+          git diff --cached --quiet || git commit -m "Atualiza capturas de tela do app"
+          git push
