@@ -3,6 +3,7 @@
   --texto: #1d2433; --suave: #667085; --borda: #e3e7ef; --erro: #c62828; --ok: #2e7d32;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--fundo); color: var(--texto); }
 h1 { font-size: 1.6rem; margin: 0 0 .25rem; } h1 span { color: #ffb020; }
 button { background: var(--primaria); color: #fff; border: 0; border-radius: 8px; padding: .55rem 1rem; font-size: .95rem; cursor: pointer; }
