@@ -10,6 +10,8 @@ Plataforma escolar composta por:
 
 ## Funcionalidades
 
+Descrição completa com capturas de tela: [docs/FUNCIONALIDADES.md](docs/FUNCIONALIDADES.md).
+
 **Aluno e responsável** (o responsável alterna entre os filhos vinculados)
 - Painel com média geral, frequência, tarefas pendentes, mensalidades em aberto, próximo evento e último comunicado
 - Comunicados (gerais ou da turma, com destaque para "importante")
