@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escola+ Backoffice</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="tela-login" class="login" hidden>
+    <form id="form-login" class="cartao">
+      <h1>Escola<span>+</span></h1>
+      <p class="sub">Backoffice da secretaria</p>
+      <label>E-mail <input name="email" type="email" required autocomplete="username"></label>
+      <label>Senha <input name="senha" type="password" required autocomplete="current-password"></label>
+      <button type="submit">Entrar</button>
+      <p id="erro-login" class="erro"></p>
+    </form>
+  </section>
+
+  <div id="tela-app" class="layout" hidden>
+    <aside>
+      <h1>Escola<span>+</span></h1>
+      <nav id="menu"></nav>
+      <button id="sair" class="secundario">Sair</button>
+    </aside>
+    <main>
+      <header><h2 id="titulo"></h2><div id="acoes"></div></header>
+      <div id="conteudo"></div>
+    </main>
+  </div>
+
+  <dialog id="dialogo">
+    <form id="form-registro" method="dialog">
+      <h3 id="dialogo-titulo"></h3>
+      <div id="campos"></div>
+      <p id="erro-registro" class="erro"></p>
+      <div class="botoes">
+        <button type="button" class="secundario" id="cancelar">Cancelar</button>
+        <button type="submit" id="salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

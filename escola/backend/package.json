@@ -1,0 +1,18 @@
+{
+  "name": "escola-backoffice",
+  "version": "1.0.0",
+  "description": "API e backoffice do app escolar Escola+ (tudo em um)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning src/server.js",
+    "seed": "node --no-warnings=ExperimentalWarning src/seed.js",
+    "test": "node --no-warnings=ExperimentalWarning --test test/*.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

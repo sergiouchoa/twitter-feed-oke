@@ -1,0 +1,84 @@
+# Implantação do backoffice Escola+ em Kubernetes (OKE, GKE, EKS, AKS...).
+# 1) Publique a imagem:  docker build -t <registro>/escola-backoffice:1.0 escola/backend && docker push ...
+# 2) Ajuste "image" abaixo e os valores do Secret.
+# 3) kubectl apply -f escola/deploy/escola.kubernetes.yml
+#
+# O banco é SQLite em volume persistente, por isso replicas: 1 e strategy Recreate.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: escola-segredos
+type: Opaque
+stringData:
+  JWT_SECRET: "troque-por-um-valor-longo-e-aleatorio"
+  ADMIN_EMAIL: "admin@suaescola.com.br"
+  ADMIN_SENHA: "troque-esta-senha"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: escola-dados
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: escola-backoffice
+  labels:
+    app: escola-backoffice
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: escola-backoffice
+  template:
+    metadata:
+      labels:
+        app: escola-backoffice
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: escola-backoffice
+          image: REGISTRO/escola-backoffice:1.0
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: escola-segredos
+          env:
+            - name: SEED_DEMO
+              value: "false"
+          volumeMounts:
+            - name: dados
+              mountPath: /data
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 512Mi }
+      volumes:
+        - name: dados
+          persistentVolumeClaim:
+            claimName: escola-dados
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: escola-backoffice
+spec:
+  type: LoadBalancer
+  selector:
+    app: escola-backoffice
+  ports:
+    - port: 80
+      targetPort: 8080

@@ -1,0 +1,14 @@
+# Execução local ou em uma VM na nuvem: docker compose -f escola/deploy/docker-compose.yml up -d
+services:
+  backoffice:
+    build: ../backend
+    ports: ["8080:8080"]
+    environment:
+      JWT_SECRET: troque-por-um-valor-longo-e-aleatorio
+      ADMIN_EMAIL: admin@escola.local
+      ADMIN_SENHA: admin123
+      SEED_DEMO: "true"
+    volumes: ["dados:/data"]
+    restart: unless-stopped
+volumes:
+  dados:
